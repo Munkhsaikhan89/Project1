@@ -1,0 +1,2 @@
+HTMLAnchorElement
+HTMLFormElement

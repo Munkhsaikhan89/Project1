@@ -49,6 +49,9 @@ export default function Login() {
       <Link href="../components/SignUp">
         <div>to sign up</div>
       </Link>
+      <Link href="../components/EmplooyDashboard">
+        <div>Dashboard</div>
+      </Link>
     </div>
   );
 }

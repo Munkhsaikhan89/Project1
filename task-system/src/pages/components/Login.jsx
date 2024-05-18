@@ -60,6 +60,9 @@ export default function Login() {
         </button>
         <p className="mt-4 text-center">
           Not a member? <Link href="../components/SignUp" legacyBehavior><a className="text-purple-500 hover:underline">Signup now</a></Link>
+          <br />
+          Not a member? <Link href="../components/EmplooyDashboard" legacyBehavior><a className="text-purple-500 hover:underline">Dashboard</a></Link>
+
         </p>
       </div>
     </div>

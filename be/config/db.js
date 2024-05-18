@@ -13,6 +13,7 @@ const sql = postgres({
   ssl: "require",
   connection: {
     options: `project=${ENDPOINT_ID}`,
+    
   },
 });
 export default sql;

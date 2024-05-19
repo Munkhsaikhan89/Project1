@@ -1,15 +1,16 @@
+import React, { useState } from "react";
 import Link from "next/link";
-import { useState } from "react";
 import { useRouter } from "next/router";
-export default function Login() {
+
+const Login = () => {
   const [gmail, setGmail] = useState("");
   const [password, setPassword] = useState("");
   const API_DATABASE = "http://localhost:2000/Login";
-  const { route, push } = useRouter();
+  const router = useRouter();
 
   const checkUser = async () => {
     try {
-      const response = await fetch(`${API_DATABASE}`, {
+      const response = await fetch(API_DATABASE, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -24,9 +25,14 @@ export default function Login() {
 
       const user = await response.json();
       console.log("newData:", user);
-      if(user){push("./UserDashboard")}
+      if (user) {
+        router.push({
+          pathname: "/components/UserDashboard",
+          query: user,
+        });
+      }
     } catch (error) {
-      console.log("Error:", error);
+      console.error("Error:", error);
     }
   };
 
@@ -55,18 +61,25 @@ export default function Login() {
             <input type="checkbox" className="mr-2" />
             Remember me
           </label>
-          <a href="#" className="text-sm text-purple-500 hover:underline">Forgot password?</a>
+          <Link href="#" className="text-sm text-purple-500 hover:underline">
+            Forgot password?
+          </Link>
         </div>
-        <button onClick={checkUser} className="w-full bg-gradient-to-r from-purple-400 to-purple-600 text-white py-2 rounded-md mt-6">
+        <button
+          onClick={checkUser}
+          className="w-full bg-gradient-to-r from-purple-400 to-purple-600 text-white py-2 rounded-md mt-6"
+        >
           Login
         </button>
-        <p className="mt-4 text-center">
-          Not a member? <Link href="../components/SignUp" legacyBehavior><a className="text-purple-500 hover:underline">Signup now</a></Link>
-          <br />
-          Not a member? <Link href="../components/EmplooyDashboard" legacyBehavior><a className="text-purple-500 hover:underline">Dashboard</a></Link>
-
-        </p>
+        <div className="mt-4 text-center">
+          Not a member?{" "}
+          <Link href="../components/SignUp">
+            <div className="text-purple-500 hover:underline">Signup now</div>
+          </Link>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Login;

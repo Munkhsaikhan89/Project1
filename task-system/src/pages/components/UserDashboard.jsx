@@ -7,20 +7,8 @@ const Dashboard = () => {
     ...Array.from({ length: 20 }, (_, index) => ({ userId: '12347', taskName: `Task ${index + 3}` }))
   ]);
 
-  const [newTask, setNewTask] = useState({ userId: '', taskName: '' });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewTask({ ...newTask, [name]: value });
-  };
-
-  const handleAddTask = (e) => {
-    e.preventDefault();
-    if (newTask.userId && newTask.taskName) {
-      setTasks([...tasks, { ...newTask }]);
-      setNewTask({ userId: '', taskName: '' });
-    }
-  };
+  const [taskName, setTaskName] = useState("");
+    const [emplooyId, setEmplooyId] = useState("");
 
   return (
     <div className="dashboard-container">
@@ -37,26 +25,27 @@ const Dashboard = () => {
           ))}
         </div>
         <div className="task-item">  <section className="task-form-section">
-          <form onSubmit={handleAddTask} className="task-form">
+          <form className="task-form">
             <div className="task-list">
                 <input
               type="text"
-              name="EmployeeId"
               placeholder="Employee ID"
-              value={newTask.userId}
-              onChange={handleInputChange}
-              required
+              value={emplooyId}
+              onChange={(e)=>{  setEmplooyId(e.target.value);
+}}
             />
             <input
               type="text"
-              name="taskName"
               placeholder="Task Name"
-              value={newTask.taskName}
-              onChange={handleInputChange}
-              required
+              value={taskName}
+              onChange={(e)=>{
+                  setTaskName(e.target.value);
+              }}
             />
             <div className="logout-button">            
-                <button type="button">Add Task</button>
+                <button onClick={()=>{
+                  console.log(taskName , emplooyId);
+                }} type="button">Add Task</button>
             </div>
             </div>
             

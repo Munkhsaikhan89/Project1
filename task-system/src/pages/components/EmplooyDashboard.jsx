@@ -1,24 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
+import mockdata from "@/pages/mockdata";
+import Modal from './Modal';
 
 const Dashboard = () => {
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const handleClick = (task) => {
+    setSelectedTask(task);
+  };
+
+  const closeModal = () => {
+    setSelectedTask(null);
+  };
+
   return (
     <div className="dashboard-container grid grid-cols-2 gap-20 p-20 bg-gradient-to-r from-blue-500 to-blue-700 font-sans">
-      {/* Tasks Section */}
       <div className="tasks">
         <h2 className="sticky top-0 bg-white px-4 py-2 border-b border-gray-300">Tasks</h2>
         <div className="task-list overflow-y-auto">
-          <a href="task1.html" className="task-item">
-            <span>User ID: 12345</span>
-            <span>Task Name: Task 1</span>
-          </a>
-          <a href="task2.html" className="task-item">
-            <span>User ID: 12346</span>
-            <span>Task Name: Task 2</span>
-          </a>
-          {Array.from({ length: 20 }, (_, index) => (
-            <a href={`task${index + 3}.html`} className="task-item" key={index}>
-              <span>User ID: 12347</span>
-              <span>Task Name: Task {index + 3}</span>
+          {mockdata.map((el, index) => (
+            <a
+              key={index}
+              onClick={() => handleClick(el)}
+              href="#"
+              className="task-item"
+            >
+              <span>{el.name}</span>
+              <span>{el.id}</span>
             </a>
           ))}
         </div>
@@ -46,6 +54,8 @@ const Dashboard = () => {
           ))}
         </ul>
       </div>
+
+      {selectedTask && <Modal task={selectedTask} onClose={closeModal} />}
     </div>
   );
 };

@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { useState } from "react";
-
+import { useRouter } from "next/router";
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [gmail, setGmail] = useState("");
   const [password, setPassword] = useState("");
   const API_DATABASE = "http://localhost:2000/Login";
+  const { route, push } = useRouter();
 
   const checkUser = async () => {
     try {
@@ -14,15 +15,16 @@ export default function Login() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ gmail, password }),
       });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
 
-      const newData = await response.json();
-      console.log("newData:", newData);
+      const user = await response.json();
+      console.log("newData:", user);
+      if(user){push("./UserDashboard")}
     } catch (error) {
       console.log("Error:", error);
     }
@@ -36,9 +38,9 @@ export default function Login() {
           <input
             placeholder="Email Address"
             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            value={email}
+            value={gmail}
             type="email"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setGmail(e.target.value)}
           />
           <input
             placeholder="Password"

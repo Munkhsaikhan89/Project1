@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const Login = () => {
+const EmployeeLogin = () => {
   const [gmail, setGmail] = useState("");
   const [password, setPassword] = useState("");
-  const API_DATABASE = "http://localhost:2000/Login";
+  const API_DATABASE = "http://localhost:2000/EmployeesLogin";
   const router = useRouter();
 
   const checkUser = async () => {
@@ -23,12 +23,18 @@ const Login = () => {
         throw new Error("Network response was not ok");
       }
 
-      const user = await response.json();
-      console.log("newData:", user);
-      if (user) {
+      const data = await response.json();
+      console.log("newData:", data);
+      if (data) {
         router.push({
-          pathname: "/components/UserDashboard",
-          query: user,
+          pathname: "./EmplooyDashboard",
+          query: {
+            employeeId: data.user.employee_id,
+            firstName: data.user.firstname,
+            lastName: data.user.lastname,
+            email: data.user.gmail,
+            phone: data.user.phone_number,
+          },
         });
       }
     } catch (error) {
@@ -39,7 +45,7 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-form-wrapper">
-        <h2>Login Form</h2>
+        <h2>Employee's Login</h2>
         <div className="flex flex-col gap-4">
           <input
             placeholder="Email Address"
@@ -68,8 +74,8 @@ const Login = () => {
           Login
         </button>
         <div className="mt-4 text-center">
-          Not a member?{" "}
-          <Link href="../components/SignUp">
+          Not a member?
+          <Link href="../components/EmployeeSignUp">
             <div className="text-purple-500 hover:underline">Signup now</div>
           </Link>
           <Link href="../">
@@ -81,4 +87,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default EmployeeLogin;

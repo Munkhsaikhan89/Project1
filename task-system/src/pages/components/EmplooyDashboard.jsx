@@ -1,17 +1,109 @@
-import React, { useState } from "react";
-import mockdata from "@/pages/mockdata";
-import Modal from "./Modal";
+import React, { useState, useEffect } from "react";
+import Modal from "@mui/material/Modal";
+import { Box, Typography } from "@mui/material";
+import Link from "next/link";
+import { useRouter } from "next/router";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 const Dashboard = () => {
   const [selectedTask, setSelectedTask] = useState(null);
+  const [employeeData, setEmployeeData] = useState({});
+  const [employeeTasks, setEmployeeTasks] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [howToDo, setHowToDo] = useState("");
+  const [explanationData, setExplanationData] = useState([]);
+  const API_DATABASE = "http://localhost:2000/EmployeeTasks";
+  const API_LOG = "http://localhost:2000/addTaskLog";
+
+  const router = useRouter();
+  const { query } = router;
+
+  useEffect(() => {
+    if (Object.keys(query).length > 0) {
+      setEmployeeData(query);
+    }
+  }, [query]);
 
   const handleClick = (task) => {
     setSelectedTask(task);
+    setOpen(true); // Open the modal when a task is clicked
   };
 
-  const closeModal = () => {
-    setSelectedTask(null);
+  const closeModal = async () => {
+    setOpen(false);
+    sendLog();
+    setHowToDo("");
   };
+
+  const sendLog = async () => {
+    try {
+      const response = await fetch(`${API_LOG}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          task_log: howToDo,
+          task_id: selectedTask.task_id,
+          employee_id: employeeData.employeeId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      console.log("Log sent successfully");
+      const logData = await response.json();
+      setExplanationData(logData);
+      console.log(explanationData);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const getTasks = async () => {
+    try {
+      const response = await fetch(
+        `${API_DATABASE}?employee_id=${query.employeeId}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const tasks = await response.json();
+      setEmployeeTasks(tasks);
+    } catch (error) {
+      console.error("Error:", error);
+      setEmployeeTasks([]);
+    }
+  };
+
+  useEffect(() => {
+    if (query.employeeId) {
+      getTasks();
+    }
+  }, [query.employeeId]);
 
   return (
     <div className="dashboard-container grid grid-cols-2 gap-20 p-20 bg-gradient-to-r from-blue-500 to-blue-700 font-sans">
@@ -20,55 +112,51 @@ const Dashboard = () => {
           Tasks
         </h2>
         <div className="task-list overflow-y-auto">
-          {mockdata.map((el, index) => (
-            <a
+          {employeeTasks?.map((el, index) => (
+            <div
               key={index}
               onClick={() => handleClick(el)}
-              href="#"
-              className="task-item"
+              className="task-item block py-2 px-4 hover:bg-blue-300 cursor-pointer"
             >
-              <span>{el.name}</span>
-              <span>{el.id}</span>
-            </a>
+              <div>Task Name: {el.name}</div>
+              <div>Task Explanation: {el.explanation}</div>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Employee Information Section */}
       <div className="employee-info flex flex-col justify-center items-center">
         <img
-          src="naruto.jpg"
+          src="https://static.vecteezy.com/system/resources/previews/002/318/271/large_2x/user-profile-icon-free-vector.jpg"
           alt="Employee Photo"
           className="rounded-full mb-4"
           width="100"
           height="100"
         />
         <p className="text-left w-full max-w-xs mb-2">
-          <strong>Employee ID:</strong> 12345
-        </p>
-        <p className=" text-left w-full max-w-xsmb-2">
-          <strong>Name:</strong> John
+          <strong>Employee ID:</strong> {employeeData.employeeId}
         </p>
         <p className="text-left w-full max-w-xs mb-2">
-          <strong>Name:</strong> John
+          <strong>Name:</strong> {employeeData.firstName}
         </p>
         <p className="text-left w-full max-w-xs mb-2">
-          <strong>Surname:</strong> Doe
+          <strong>Surname:</strong> {employeeData.lastName}
         </p>
         <p className="text-left w-full max-w-xs mb-2">
-          <strong>Email:</strong> john.doe@xyz.com
+          <strong>Email:</strong> {employeeData.email}
         </p>
         <p className="text-left w-full max-w-xs mb-2">
-          <strong>Phone:</strong> 123-456-7890
+          <strong>Phone:</strong> {employeeData.phone}
         </p>
-        <div className="logout-button mt-auto">
-          <button className="bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded-md">
-            Logout
-          </button>
-        </div>
+        <Link href="../">
+          <div className="logout-button mt-auto">
+            <button className="bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded-md">
+              Logout
+            </button>
+          </div>
+        </Link>
       </div>
 
-      {/* Company Notices Section */}
       <div className="company-notices col-span-2">
         <h2 className="sticky top-0 bg-white px-4 py-2 border-b border-gray-300">
           Company Notices
@@ -82,7 +170,45 @@ const Dashboard = () => {
         </ul>
       </div>
 
-      {selectedTask && <Modal task={selectedTask} onClose={closeModal} />}
+      {selectedTask && (
+        <Modal
+          open={open}
+          onClose={closeModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              {selectedTask.name}
+            </Typography>
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              {selectedTask.task_id}
+            </Typography>
+            <strong>
+              <span>Log:</span>
+              {explanationData?.map((el, i) => (
+                <div key={i}>
+                  <span>{el.explanation}</span>
+                </div>
+              ))}
+            </strong>
+            <textarea
+              className="w-full border-[1px]"
+              value={howToDo}
+              onChange={(e) => {
+                setHowToDo(e.target.value);
+              }}
+              placeholder="Yaj hiih we"
+            />
+            <div
+              className="w-full flex justify-center items-center bg-gray-100 shadow-lg"
+              onClick={closeModal}
+            >
+              Ok
+            </div>
+          </Box>
+        </Modal>
+      )}
     </div>
   );
 };

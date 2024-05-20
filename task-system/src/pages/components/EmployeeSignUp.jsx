@@ -1,16 +1,13 @@
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import Alert from "@mui/material/Alert";
 
-const SignUp = () => {
-  const API_DATABASE = "http://localhost:2000/SignUp";
-  const [showWarning, setShowWarning] = useState(false);
+export default function EmployeeSignUp() {
+  const API_DATABASE = "http://localhost:2000/EmployeeSignUp";
 
   const registerUser = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await fetch(`${API_DATABASE}`, {
+      const response = await fetch(API_DATABASE, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -49,13 +46,8 @@ const SignUp = () => {
 
   return (
     <div className="signup-container">
-      {showWarning && (
-        <Alert className="absolute left-[40%] top-[10px]" severity="error">
-          Tanii oruulsan data buruu bn.
-        </Alert>
-      )}
       <div className="signup-form-wrapper">
-        <h2>Sign Up Form</h2>
+        <h2>Employee's Sign Up</h2>
         <Formik
           initialValues={{
             firstName: "",
@@ -134,15 +126,13 @@ const SignUp = () => {
             </Form>
           )}
         </Formik>
-        <div className="mt-4 text-center">
-          Already a member?{" "}
-          <Link href="../components/Login" legacyBehavior>
+        <p className="mt-4 text-center">
+          Already a member?
+          <Link href="../components/EmployeeLogin" legacyBehavior>
             <div className="text-purple-500 hover:underline">Login here</div>
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   );
-};
-
-export default SignUp;
+}

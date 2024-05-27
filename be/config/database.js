@@ -7,7 +7,7 @@ const sql = postgres({
   username: 'Test1_owner',
   password: 'pNvSg3E7byCw',
   port: 5432,
-  ssl: { rejectUnauthorized: false }, // Correct ssl configuration
+  ssl: { rejectUnauthorized: false },
   connection: {
     options: `project=ep-square-sky-a1vkt05d`,
   },

@@ -1,6 +1,6 @@
 import express, { response } from "express";
 import cors from "cors";
-import sql from "./config/database.js";
+import sql from "./config/database.js"; // Ensure this path is correct
 import { v4 as uuid } from "uuid";
 import bcrypt from "bcrypt";
 
@@ -64,7 +64,7 @@ app.post("/addTask", async (request, response) => {
     await sql`INSERT INTO task (customer_id, name, employee_id, task_id , explanation) 
               VALUES (${userId}, ${taskName}, ${employeeId}, ${task_id} , ${taskExplanation})`;
 
-    const tasks = await sql`SELECT * FROM GetTasksByCustomerId('${userId}')`;
+    const tasks = await sql`SELECT * FROM task WHERE customer_id = ${userId}`;
 
     response.status(200).send(tasks);
   } catch (error) {
@@ -78,7 +78,7 @@ app.get("/pullTasks", async (request, response) => {
   try {
     const userId = request.query.userId;
     console.log(userId);
-    const tasks = await sql`SELECT * FROM GetTasksByCustomerId('${userId}')`;
+    const tasks = await sql`SELECT * FROM task WHERE customer_id = ${userId}`;
     console.log(tasks);
     response.status(200).send(tasks);
   } catch (error) {
@@ -106,11 +106,9 @@ app.post("/EmployeeSignUp", async (request, response) => {
 
     console.log("Generated Values:", { id, firstName, lastName, email, hash });
 
-    await sql`
-      CALL insert_employee(${id}, ${lastName}, ${firstName}, ${email}, ${hash})
-    `;
+    await sql` CALL insert_employee(${id}, ${lastName}, ${firstName}, ${email}, ${hash})`;
 
-    console.log("Employee created successfully:", id);
+    console.log("User created successfully:", id);
     response.status(201).send({ success: true });
   } catch (error) {
     console.error("Error:", error);
@@ -119,7 +117,6 @@ app.post("/EmployeeSignUp", async (request, response) => {
       .send({ success: false, error: "Internal server error" });
   }
 });
-
 app.post("/EmployeesLogin", async (request, response) => {
   const { gmail, password } = request.body;
   let jump = false;
@@ -161,15 +158,10 @@ app.post("/addTaskLog", async (request, response) => {
   try {
     const { task_log, task_id, employee_id } = request.body;
     const id = uuid();
-    
     await sql`
-      CALL insert_log1(${id}, ${task_id}, ${employee_id}, ${task_log})
+    CALL insert_log1(${id}, ${task_id}, ${employee_id}, ${task_log})
     `;
-
-    const logData = await sql`
-      SELECT * FROM log WHERE task_id = ${task_id}
-    `;
-
+    const logData = await sql`SELECT * FROM log where task_id = ${task_id}`;
     console.log("Log added successfully");
     response.status(200).send(logData);
   } catch (error) {
